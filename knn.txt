@@ -1,0 +1,73 @@
+# knn算法
+
+### 什么是knn算法
+
+- 寻找最近的k个数据，推测新数据的分类
+
+### 算法原理
+
+![image-20220119174920537](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20220119174920537.png)
+
+### 实战应用
+
+```python
+import random
+import csv
+#读取
+from unittest import result
+
+with open('Prostate_Cancer.csv','r')as file:
+# 将Prostate_Cancer.csv以文本的方式打开并且命名为file
+    reader=csv.DictReader(file)#dictreader以字典的形式读取文件并赋给read
+    # 要注意要读取的文件要放入pycharm中
+    dates=[row for row in reader]#把reader中的row都存到dates中
+
+#分组
+random.shuffle(dates)#打乱顺序避免每次运行数据巧合使得结果合理
+n=len(dates)//3#     //可以保留整数   /有小数
+
+test_set=dates[0:n]
+train_set=dates[n:]
+#数据切成三分之一测试组，三分之二训练组
+
+#knn距离
+def distance(d1,d2)#d1 d2代表两个要计算距离的点
+    res=0#求和
+    for key in ("radius","texture","perimeter","area","smoothness","compactness","symmetry","fractal_dimension"):
+        #res+=d1[key]-d2[key]不能这样减因为d1[key]是字符串要转型而且有些含有小数点
+        #key代表点里的属性
+    res+=(float(d1[key])-float(d2[key])**2
+    return res**0.5
+
+K=5
+def knn(date):         #寻找date这个数据最近的K个数
+    #1.距离
+    res=[
+        {"result":train['diagnose_result'],"distance":distance(date:train)]}
+        for train in train_set#把set里的全都循环一遍
+    ]
+    #2.排序--升序
+    res=sorted(res,key=lambda item:item['distance'])#用distance大小升序排res;item是res中的result或者distance某一项
+    #3.取前K个
+    res2=res[0:K]
+    #4.加权平均
+    result={'B':0,'M':0}#M和B权重都为0
+    
+    #总距离
+    sum=0
+    for r in res2:
+        sum+=['distance']#加权
+        
+    for r in rest2:
+        result[r['result']]+=1-r['distance']/sum
+          
+          #测试阶段
+correct=0
+for test in test_set
+    result=test['dignosis_result']#测试数据
+    result2=knn(test)#实际数据
+    
+    if result=result2:
+        correct+=1
+```
+
