@@ -1,0 +1,849 @@
+# **Linux**
+
+### **1.Linux发行版本**
+
+Linux发行版 (也被叫做 GNU/Linux 发行版) 通常包含了包括桌面环境、办公套件、媒体播放器、数据库等应用软件。
+
+目前市面上较知名的发行版有：Ubuntu、RedHat、CentOS、Debian、Fedora、SuSE、OpenSUSE、Arch Linux、SolusOS 等。
+
+### **2.Linux系统的安装**
+
+##### 2.1通过 apt 安装／卸载软件
+
+- apt 是 `Advanced Packaging Tool` ，是 Linux 下的一款安装包管理工具
+- 可以在终端中方便的 **安装／卸载／更新软件包**
+
+```
+# 1. 安装软件
+$ sudo apt install 软件包
+# 2. 卸载软件
+$ sudo apt remove 软件名
+# 3. 更新已安装的包
+$ sudo apt upgrade
+```
+
+### 3.Linux操作系统相关
+
+**3.1帮助命令**
+
+**3.1.1help**
+
+一般是linux命令自带的帮助信息
+
+如：ls --help
+
+**3.1.2man**
+
+man是linux提供的一个手册，包含了绝大部分的命令、函数使用说明
+
+该手册分成很多章节（section），使用man时可以指定不同的章节来浏览。
+
+例：man ls ; man 2 printf
+
+**man中各个section意义如下：**
+
+- Standard commands（标准命令）
+- System calls（系统调用，如open,write）
+- Library functions（库函数，如printf,fopen）
+- Special devices（设备文件的说明，/dev下各种设备）
+- File formats（文件格式，如passwd）
+- Games and toys（游戏和娱乐）
+- Miscellaneous（杂项、惯例与协定等，例如Linux档案系统、网络协定、ASCII 码；environ全局变量）
+- Administrative Commands（管理员命令，如ifconfig）
+
+**man设置了如下的功能键：**
+
+| 功能键  | 功能                 |
+| ------- | -------------------- |
+| 空格键  | 显示手册页的下一屏   |
+| Enter键 | 一次滚动手册页的一行 |
+| b       | 回滚一屏             |
+| f       | 前滚一屏             |
+| q       | 退出man命令          |
+| h       | 列出所有功能键       |
+| /word   | 搜索word字符串       |
+
+![img](https://img-blog.csdnimg.cn/img_convert/eaa669cc38073241cb90af97af43bc92.png)
+
+**3.1.3info**
+
+###### **命令概述**
+
+- info命令是**Linux下info格式的帮助指令。阅读 info 格式的文档。**
+- 就内容来说，info页面比man page编写得要更好、更容易理解，也更友好，但man page使用起来确实要更容易得多。一个man page只有一页，而info页面几乎总是将它们的内容组织成多个区段（称为节点），每个区段也可能包含子区段（称为子节点）。理解这个命令的窍门就是**不仅要学习如何在单独的Info页面中浏览导航，还要学习如何在节点和子节点之间切换。可**能刚开始会一时很难在info页面的节点之间移动和找到你要的东西，真是具有讽刺意味：原本以为对于新手来说，某个东西比man命令会更好些，但实际上学习和使用起来更困难。
+
+###### 命令格式
+
+- **info [选项] 参数**
+- 参数：指定需要获得帮助的主题，可以是指令、函数以及配置文件
+
+```
+-d：添加包含info格式帮助文档的目录；
+-f：指定要读取的info格式的帮助文档；
+-n：指定首先访问的info帮助文件的节点；
+-o：输出被选择的节点内容到指定文件。
+```
+
+###### 参考示例
+
+- 在info后面输入命令的名称就可以查看该命令的info帮助文档了
+
+```bash
+[root@localhost ~]# info pwd
+```
+
+###### **常用命令**
+
+```
+？     显示帮助窗口
+ 
+在帮助窗口中：
+Ctrl-x 0          关闭帮助窗口
+Ctrl-x Ctrl-c    关闭整个 Info
+        
+q      退出 info
+n      打开与本 Node 关联的下一个 Node
+p      打开与本 Node 关联的前一个 Node
+u      打开与本 Node 关联的上一个 Node
+l      回到上一次访问的 Node
+m或g   选择一个菜单项（Node 的名字）
+       输入指定菜单的名字后按回车，打开指定菜单项关联的 Node
+空格键 下一页（PageDown 也可以，下一页从当前页的最后两行开始算起）
+       下一个 Node （若当前页在 Node 文档的末尾）
+Del 键 上一页（PageUp 也可以，上一页从当前页的开始两行开始算起）
+       上一个 Node （若当前页 Node 文档的开始）
+ 
+b 或 t 或 Home   文档的开始（b 是 begining 的意思）
+e 或 End         文档的末尾（b 是 ending 的意思）
+Ctrl-l    刷新当前页，若当前文档显示情况有问题时
+Ctrl-g    取消所键入的指令
+```
+
+**3.2 文件与目录相关操作**
+
+**3.2.1查看**
+
+###### cat
+
+cat 命令可以用来 查看文件内容、创建文件、文件合并、追加文件内容 等功能
+cat 会一次显示所有的内容，适合 查看内容较少 的文本文件
+
+| 选项 | 含义               |
+| ---- | ------------------ |
+| -b   | 对非空输出行编号   |
+| -n   | 对输出的所有行编号 |
+
+Linux 中还有一个 nl 的命令和 cat -b 的效果等价
+
+###### more
+
+- more 命令可以用于分屏显示文件内容，每次只显示一页内容
+
+- 适合于 查看内容较多的文本文件
+
+  **more操作键**
+
+| 操作键 | 功能                    |
+| ------ | ----------------------- |
+| 空格键 | 显示手册页的下一屏      |
+| Enter  | 键 一次滚动手册页的一行 |
+| b      | 回滚一屏                |
+| f      | 前滚一屏                |
+| q      | 退出                    |
+| /word  | 搜索 word 字符串        |
+
+###### grep
+
+Linux 系统中 grep 命令是一种强大的文本搜索工具
+grep 允许对文本文件进行 模式查找，所谓模式查找，又被称为正则表达式。
+
+| 选项 | 含义                                     |
+| ---- | ---------------------------------------- |
+| -n   | 显示匹配行及行号                         |
+| -v   | 显示不包含匹配文本的所有行（相当于求反） |
+| -i   | 忽略大小写                               |
+
+常用的两种模式查找
+
+| 参数 | 含义                     |
+| ---- | ------------------------ |
+| ^a   | 行首，搜寻以 a 开头的行  |
+| ke$  | 行尾，搜寻以 ke 结束的行 |
+
+**3.2.2查看**
+
+###### **ls 命令说明**
+
+- ls 是英文单词 list 的简写，其功能为列出目录的内容，是用户最常用的命令之一，类似于 DOS下的 dir 命令
+
+###### **Linux下文件和目录的特点**
+
+- Linux 文件 或者 目录 名称最长可以有 256 个字符参数 含义
+- 以 . 开头的文件为隐藏文件，需要用 -a 参数才能显示
+- . 代表当前目录
+- … 代表上一级目录
+
+###### ls 常用选项
+
+
+
+| 参数 | 含义                                         |
+| ---- | -------------------------------------------- |
+| -a   | 显示指定目录下所有子目录与文件，包括隐藏文件 |
+| -l   | 以列表方式显示文件的详细信息                 |
+| -h   | 配合 -l 以人性化的方式显示文件大小           |
+
+###### ls通配符的使用
+
+| 通配符 | 含义                                 |
+| ------ | ------------------------------------ |
+| *      | 代表任意个数个字符                   |
+| ?      | 代表任意一个字符，至少 1 个          |
+| []     | 表示可以匹配字符组中的任一一个       |
+| [abc]  | 匹配 a、b、c 中的任意一个            |
+| [a-f]  | 匹配从 a 到 f 范围内的的任意一个字符 |
+
+注意：以 . 开头的文件为隐藏文件，需要用 -a 参数才能显示
+
+**3.2.3创建和删除操作**
+
+###### touch
+
+- 创建文件或修改文件时间
+  如果文件 不存在，可以创建一个空白文件
+  如果文件 已经存在，可以修改文件的末次修改日期
+
+mkdir
+
+- 创建一个新的目录
+
+
+
+| 选项 | 含义             |
+| ---- | ---------------- |
+| -p   | 可以递归创建目录 |
+
+**新建目录的名称 不能与当前目录中 已有的目录或文件 同名**
+
+rm
+
+- 删除文件或目录
+  使用 rm 命令要小心，因为文件删除后不能恢复
+
+| 选项 | 含义                                                  |
+| ---- | ----------------------------------------------------- |
+| -f   | 强制删除，忽略不存在的文件，无需提示                  |
+| -r   | 递归地删除目录下的内容，**删除文件夹 时必须加此参数** |
+
+**3.2.4拷贝和移动**
+
+| 序号 | 命令               | 对应英文 | 作用                                 |
+| ---- | ------------------ | -------- | ------------------------------------ |
+| 01   | tree [目录名]      | tree     | 以树状图列出文件目录结构             |
+| 02   | cp 源文件目标文件  | copy     | 复制文件或者目录                     |
+| 03   | mv 源文件 目标文件 | move     | 移动文件或者目录／文件或者目录重命名 |
+
+###### tree
+
+- tree 命令可以以树状图列出文件目录结构
+
+| 选项 | 含义       |
+| ---- | ---------- |
+| -d   | 只显示目录 |
+
+###### cp
+
+- cp 命令的功能是将给出的 **文件 或 目录** 复制到另一个 **文件 或 目录** 中，相当DOS 下的 copy命令
+
+| 选 项 | 含义                                                         |
+| ----- | ------------------------------------------------------------ |
+| -i    | 覆盖文件前提示                                               |
+| -r    | 若给出的源文件是目录文件，则 cp 将递归复制该目录下的所有子目录和文件，目标文件必 |
+
+###### mv
+
+- mv 命令可以用来 移动 文件 或 目录，也可以给 文件或目录重命名
+
+| 选项 | 含义           |
+| ---- | -------------- |
+| -i   | 覆盖文件前提示 |
+
+### 4.打包压缩
+
+###### 4.1 tar
+
+`tar` 是 Linux 中最常用的 **备份**工具，此命令可以 **把一系列文件** 打包到 一个**大文件**中，也可以把一个 打包的大文件恢复成一系列文件
+`tar` 的命令格式如下:
+
+```
+ 打包文件
+
+ tar -cvf 打包文件.tar 被打包的文件／路径...
+
+   解包文件
+
+ tar -xvf 打包文件.tar
+```
+
+###### **tar选项说明：**
+
+| 选项 | 含义                                                         |
+| ---- | ------------------------------------------------------------ |
+| c    | 生成档案文件，创建打包文件                                   |
+| x    | 解开档案文件                                                 |
+| v    | 列出归档解档的详细过程，显示进度                             |
+| f    | 指定档案文件名称，f 后面一定是 .tar 文件，所以必须放选项最后 |
+
+注意： **f 选项必须放在最后，其他选项顺序可以随意**
+
+###### 4.2gzip
+
+- tar 与 gzip 命令结合可以使用实现文件 打包和压缩
+  tar 只负责打包文件，但不压缩
+  用 gzip 压缩 tar 打包后的文件，其扩展名一般用 xxx.tar.gz
+
+> 在 Linux 中，最常见的压缩文件格式就是 xxx.tar.gz
+
+- 在 tar 命令中有一个选项 -z 可以调用 gzip ，从而可以方便的实现压缩和解压缩的
+- 功能命令格式如下：
+
+```
+# 压缩文件
+tar -zcvf 打包文件.tar.gz 被压缩的文件／路径...
+# 解压缩文件
+tar -zxvf 打包文件.tar.gz
+# 解压缩到指定路径
+tar -zxvf 打包文件.tar.gz -C 目标路径
+```
+
+
+
+| 选项 | 含义                                               |
+| ---- | -------------------------------------------------- |
+| -C   | 解压缩到指定目录，注意：**要解压缩的目录必须存在** |
+
+###### 4.3bzip2(two)
+
+tar 与 bzip2 命令结合可以使用实现文件 打包和压缩（用法和 gzip 一样）
+tar 只负责打包文件，但不压缩
+用 bzip2 压缩 tar 打包后的文件，其扩展名一般用 xxx.tar.bz2
+在 tar 命令中有一个选项 -j 可以调用 bzip2 ，从而可以方便的实现压缩和解压缩的功能
+命令格式如下
+
+### 5.vim编辑器的使用
+
+**5.1命令模式**：对文本进行复制、粘贴、删除、撤销等【默认进入命令模式】
+
+**模式切换**：从**输入模式**或者**末行模式**可以通过`Esc`键回到**命令模式**。
+
+| 命令 | 作用                      |
+| ---- | ------------------------- |
+| dd   | 删除(剪切)所在行          |
+| ndd  | 删除(剪切)所在行开始的n行 |
+| yy   | 复制所在行                |
+| nyy  | 复制所在行开始的n行       |
+| p    | 粘贴到光标所在行的下一行  |
+| u    | 撤销                      |
+
+**5.2输入模式**：输入文本内容
+
+**模式切换**：在**命令模式**下可以使用`a`、`i`、`o`进入**输入模式**
+
+| 按键 | 初始输入位置                   |
+| ---- | ------------------------------ |
+| `a`  | 在光标的右边进行输入           |
+| `i`  | 在光标位置进行输入             |
+| `o`  | 在光标所在行的下一行头进行输入 |
+
+
+
+**5.3末行模式**：保存、退出文档，以及设置编辑环境
+
+模式切换：在**命令模式**下，可以使用`:`进入**末行模式**
+
+> 命令	作用
+> :w	保存
+> :q	退出
+> :w!	强制保存
+> :q!	强制退出，不保存
+> :wq!	强制保存退出
+> :set nu	显示行号
+> :set nonu	不显示行号
+> :nohl	去除文本中的高亮
+> :n	跳转到第n行
+> :s/str1/str2/	将所在行的第一个str1换成str2
+> :s/str1/str2/g	将所在行的所有str1换成str2
+> :%s/str1/str1/g	将全文的所有的str1换成str2
+> /str	在全文中从上到下找str
+> ?str	在全文中从下到上找str
+> 在这些命令里，最常用的就是`:wq!`，当编辑完一个文本后，使用该命令即可强制保存退出。
+
+### 5 用户权限管理
+
+用户管理包括用户与组账号的管理。
+
+在Unix/Linux系统中，不论是由本机或是远程登录系统，每个系统都必须拥有一个账号，并且对于不同的系统资源拥有不同的使用权限。
+
+Unix/Linux系统中的root账号通常用于系统的维护和管理，它对Unix/Linux操作系统的所有部分具有不受限制的访问权限。
+
+在Unix/Linux安装的过程中，系统会自动创建许多用户账号，而这些默认的用户就称为“标准用户”。
+
+在大多数版本的Unix/Linux中，都不推荐直接使用root账号登录系统。
+
+
+###### 5.1查看当前用户：whoami
+
+查看当前系统当前账号的用户名。可通过cat /etc/passwd查看系统用户信息。
+
+```
+python@ubuntu:~/test$ whoami
+python
+```
+
+###### 5.2查看登录用户：who
+
+who命令用于查看当前所有登录系统的用户信息。
+
+常用选项：
+
+| 选项         | 含义                                               |
+| ------------ | -------------------------------------------------- |
+| -m或am I     | 只显示运行who命令的用户名、登录终端和登录时间      |
+| -q或–count   | 只显示用户的登录账号和登录用户的数量               |
+| -u           | 在登录时间后显示该用户最后一次操作到当前的时间间隔 |
+| -u或–heading | 显示列标题                                         |
+
+###### 5.3退出登录账户： exit
+
+如果是图形界面，退出当前终端；
+
+如果是使用ssh远程登录，退出登陆账户；
+
+如果是切换后的登陆用户，退出则返回上一个登陆账号。
+
+###### 5.4添加用户账号：useradd
+
+在Unix/Linux中添加用户账号可以使用adduser或useradd命令，因为adduser命令是指向useradd命令的一个链接，因此，这两个命令的使用格式完全一样。
+
+useradd命令的使用格式如下： useradd [参数] 新建用户账号
+
+| 参数 | 含义                                                         |
+| ---- | ------------------------------------------------------------ |
+| -d   | 指定用户登录系统时的主目录                                   |
+| -m   | 自动建立目录，未指定-d参数时会在/home/{当前用户}目录下建立主目录 |
+| -g   | 指定组名称                                                   |
+
+相关说明：
+
+- Linux每个用户都要有一个主目录，主目录就是第一次登陆系统，用户的默认当前目录(/home/用户)；
+- 每一个用户必须有一个主目录，所以用useradd创建用户的时候，一定给用户指定一个主目录；
+- 如果创建用户的时候，不指定组名，那么系统会自动创建一个和用户名一样的组名。
+
+若创建用户时未指定家目录，后期可通过usermod -d /home/abc abc指定
+
+
+| 命令                            | 含义                                                         |
+| ------------------------------- | ------------------------------------------------------------ |
+| useradd -d /home/abc abc -m     | 创建abc用户，如果/home/abc目录不存在，就自动创建这个目录，同时用户属于abc组 |
+| useradd -d /home/a a -g test -m | 创建一个用户名字叫a，主目录在/home/a，如果主目录不存在，就自动创建主目录，同时用户属于test组 |
+| cat /etc/passwd                 | 查看系统当前用户名                                           |
+
+
+
+###### 5.5修改用户：usermod
+
+常用的选项包括`-c, -d, -m, -g, -G, -s, -u以及-o等`，这些选项的意义与`useradd`命令中的选项一样，可以为用户指定新的资源值 。
+
+修改用户所在组：usermod -g 用户组 用户名
+
+```
+usermod -g test abc
+```
+
+改abc用户的家目录位置：usermod -d 家目录 用户名
+
+```
+usermod -d /home/abc abc
+```
+
+选项`-l 新用户名`指定一个新的账号，可修改用户名：
+
+```
+python@ubuntu:~/txt$ tail /etc/passwd -n 1 
+aaa:x:1001:1001::/home/aaa:
+python@ubuntu:~/txt$ sudo usermod -l bbb -d /home/bbb aaa   
+python@ubuntu:~/txt$ tail /etc/passwd -n 1               
+bbb:x:1001:1001::/home/bbb:
+```
+
+###### 5.5以root身份执行指令：sudo
+
+sudo命令可以临时获取root权限
+
+使用权限：在 /etc/sudoers 中有出现的使用者。
+
+```
+显示出自己（执行 sudo 的使用者）的权限
+sudo -l
+以root权限执行上一条命令
+sudo !!
+```
+
+sudoers文件配置语法
+
+```
+user  MACHINE=COMMANDS
+用户 登录的主机=（可以变换的身份） 可以执行的命令  
+```
+
+###### 5.6用户与用户组
+
+Linux是一个真实的、完整的多用户多任务操作系统，多用户多任务就是可以在系统上建立多个用户，而多个用户可以在同一时间内登录同一个系统执行各自不同的任务，而互不影响。
+
+        root ：系统维护
+    
+        www：网页修改
+    
+        ftp：文件上传
+    
+        mysql：SQL查询
+
+###### 5.7修 改文件权限
+
+| 序号 | 命令  | 作用       |
+| ---- | ----- | ---------- |
+| 01   | chown | 修改拥有者 |
+| 02   | chgrp | 修改组     |
+| 03   | chmod | 修改权限   |
+
+格式：
+
+```
+# 修改文件|目录的拥有者
+chown 用户名 文件名|目录名
+# 递归修改文件|目录的组
+chgrp -R 组名 文件名|目录名
+# 递归修改文件权限
+chmod -R 755 文件名|目录名
+```
+
+### 6.网络配置
+
+6.1配置命令
+
+6.1.1`ping`命令
+　　`ping [选项] ip或域名`：探测指定IP或域名的网络状况。
+
+```
+选项：
+-c 次数：指定ping发送包的次数
+```
+
+ 2. telnet命令
+　　telnet [域名或IP] [端口]：远程管理与端口探测命令。（telnet的远程连接是极不安全的，它是明文传递数据，并未将数据加密。所以我们并不建议使用telnet命令进行远程管理，但是我们可以通过该命令探测某个计算机中是否开放了某一端口。如：telnet 192.168.0.1 80）
+　　
+　 3. traceroute命令
+　　traceroute [选项] IP或域名：路由跟踪，查看访问某一IP或域名时经过的路由（路由路径）。（该命令可能需要单独安装）
+
+　　```
+　　选项：
+　　-n 使用IP而不使用域名显示
+　　```
+　　
+　　4. `wget`命令
+　　   　　`wget 下载地址`：下载命令。
+　　
+　　　 5. `tcpdump`命令
+　　　　`tcpdump`命令：用于监听某一网卡下某一服务的数据包接收情况（截获数据包-抓包）。如：`tcpdump -i eth0 -nnX port 21`。
+　　　　
+　　　　```
+　　　　选项：
+　　　　-i 指定监听的网卡
+　　　　-nn 将数据包中的域名与服务转为IP和端口显示
+　　　　-X 以十六进制和ASCII码显示数据包内容
+　　　　port 指定监听的端口
+　　　　```
+　　　　
+　　　　
+
+6.2配置文件
+
+###### 6.2.1网卡信息文件
+
+　　查看第一张网卡的网卡信息：
+
+```
+vi /etc/sysconfig/network-scripts/ifcfg-eth0
+```
+
+信息如下：
+
+```
+DEVICE=eth0
+HWADDR=00:0C:29:11:30:39
+TYPE=Ethernet
+UUID=5ab36190-a5df-4bf1-94d8-6c126afd05f1
+ONBOOT=yes
+NM_CONTROLLED=yes
+BOOTPROTO=dhcp
+```
+
+| 配置                       | 说明                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| `DEVICE=eth0`              | 网卡设备名，eth0表示第一张网卡                               |
+| `BOOTPROTO=none`           | 是否自动获取IP（none、static、dhcp），当值为dhcp时，只需配置上述例子中的那几项就可以联网 |
+| `HWADDR=00:0C:29:11:30:39` | MAC地址                                                      |
+|                            |                                                              |
+|                            |                                                              |
+|                            |                                                              |
+|                            |                                                              |
+|                            |                                                              |
+|                            |                                                              |
+
+> 说明：
+> 1.自动获取IP的条件是：必须在局域网内存在DHCP服务器。
+> 2.相同UUID网络配置的计算机会导致互相不能上网。
+
+### 6.2.2主机名文件
+
+　　查看主机名文件：
+
+```
+vi /etc/sysconfig/network
+```
+
+内容如下：
+
+```
+NETWORKING=yes
+HOSTNAME=localhost.localdomain
+```
+
+其中：
+1. /etc/sysconfig/network该文件中NETWORKING=no时主机将无法连接网络。
+
+2. Windows下，在同一局域网内相同主机名之间是不能进行传递的。要求在局域网内是不能有相同主机名的主机的。而在Linux中局域网内是可以有相同主机名的主机的，如默认主机名：localhost.localdomain。
+
+3. 修改/etc/sysconfig/network文件中的主机名后需要重启计算机才能生效。使用hostname 主机名命令可以临时更改主机名后，重启计算机后将失效。通过hostname命令可以查看当前主机名。
+
+  
+
+  ###### 6.2.3DNS配置文件
+
+  
+
+  　　查看DNS配置文件：
+
+  ```
+  vi /etc/resolv.conf
+  ```
+
+内容如下：
+
+```
+; generated by /sbin/dhclient-script
+search localdomain
+nameserver 192.168.134.2
+```
+
+其中最重要的是`nameserver`这一项，设置的是域名服务器的地址，多个域名服务器，则在后续添加空格继续补充域名服务器的地址，或者另起一行做类似的`nameserver`配置。
+
+### 7.软件安装与更新
+
+###### 7.1 rpm安装
+
+常见用法：
+
+rpm -ivh <rpm包名> 安装软件
+rpm -e <rpm包名> 卸载安装
+rpm -qi <rpm包名> 显示软件安装信息
+rpm -qa | grep xxx 查询软件是否安装（包括相关依赖）
+rpm -Uvh <rpm包名> 升级一个rpm
+具体参数详解：
+-i, --install 安装包
+-v, --verbose 列出更多详细信息，安装进度
+-h, --hash 安装时列出hash标记 (与 -v连用)
+-e, --erase 卸载安装包
+-U, --upgrade=+ 升级包
+–replacepkge 无论软件包是否已被安装，都强行安装软件包
+–test 安装测试，并不实际安装
+–nodeps 忽略软件包的依赖关系强行安装
+–force 忽略软件包及文件的冲突
+-q,–query:
+-a, --all 查询/校验所有的安装包-p, --package 查询/校验一个安装文件
+-l, --list 列出安装文件
+-d, --docfiles 列出所有文档文件
+-f, --file 查询/校验安装包中所包含的文件
+
+安装软件：
+
+-p, --package 查询/校验一个安装文件
+-l, --list 列出安装文件
+-d, --docfiles 列出所有文档文件
+-f, --file 查询/校验安装包中所包含的文件
+
+安装软件：
+
+-p, --package 查询/校验一个安装文件
+-l, --list 列出安装文件
+-d, --docfiles 列出所有文档文件
+-f, --file 查询/校验安装包中所包含的文件
+
+安装软件：
+
+```
+# rpm -hvi dejagnu-1.4.2-10.noarch.rpm 
+警告：dejagnu-1.4.2-10.noarch.rpm: V3 DSA 签名：NOKEY, key ID db42a60e
+准备...           
+########################################### [100%]
+```
+
+
+
+###### 7.2 yum安装
+
+yum（ Yellow dog Updater, Modified）是一个在Fedora和RedHat以及SUSE中的Shell前端软件包管理器。
+
+基於RPM包管理，能够从指定的服务器自动下载RPM包并且安装，可以自动处理依赖性关系，并且一次安装所有依赖的软体包，无须繁琐地一次次下载、安装。
+
+
+
+yum提供了查找、安装、删除某一个、一组甚至全部软件包的命令，而且命令简洁而又好记。
+
+**更新国内yum源**
+网易（163）yum源是国内最好的yum源之一 ，无论是速度还是软件版本，都非常的不错。
+
+将yum源设置为163 yum，可以提升软件包安装和更新的速度，同时避免一些常见软件版本无法找到。
+
+首先备份/etc/yum.repos.d/CentOS-Base.repo
+
+> mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+
+下载对应版本 repo 文件, 放入 /etc/yum.repos.d/
+
+CentOS5 ：http://mirrors.163.com/.help/CentOS5-Base-163.repo
+CentOS6 ：http://mirrors.163.com/.help/CentOS6-Base-163.repo
+CentOS7 ：http://mirrors.163.com/.help/CentOS7-Base-163.repo
+
+```
+wget http://mirrors.163.com/.help/CentOS7-Base-163.repo
+mv CentOS7-Base-163.repo /etc/yum.repos.d/CentOS-Base.repo
+```
+
+运行以下命令生成缓存
+
+```
+yum clean all
+yum makecache
+```
+
+### 8.磁盘管理
+
+8.1磁盘分区
+
+fdisk 是 Linux 的磁盘分区表操作工具。
+
+语法：
+
+```
+fdisk [-l] 装置名称
+```
+
+fdisk 是 Linux 的磁盘分区表操作工具。
+
+语法：
+
+```
+fdisk [-l] 装置名称
+```
+
+```
+[root@AY120919111755c246621 tmp]# fdisk -l
+
+Disk /dev/xvda: 21.5 GB, 21474836480 bytes
+255 heads, 63 sectors/track, 2610 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+    Device Boot      Start         End      Blocks   Id  System
+/dev/xvda1   *           1        2550    20480000   83  Linux
+/dev/xvda2            2550        2611      490496   82  Linux swap / Solaris
+
+Disk /dev/xvdb: 21.5 GB, 21474836480 bytes
+255 heads, 63 sectors/track, 2610 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x56f40944
+
+    Device Boot      Start         End      Blocks   Id  System
+/dev/xvdb2               1        2610    20964793+  83  Linux
+
+```
+
+查看根目录所在磁盘，并查阅该硬盘内的相关信息：
+
+```
+[root@www ~]# df /            <==注意：重点在找出磁盘文件名而已
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/hdc2              9920624   3823168   5585388  41% /
+
+[root@www ~]# fdisk /dev/hdc  <==不要加上数字！
+The number of cylinders for this disk is set to 5005.
+There is nothing wrong with that, but this is larger than 1024,
+and could in certain setups cause problems with:
+1) software that runs at boot time (e.g., old versions of LILO)
+2) booting and partitioning software from other OSs
+   (e.g., DOS FDISK, OS/2 FDISK)
+
+Command (m for help):     <==等待你的输入！
+```
+
+输入 m 后，就会看到底下这些命令介绍
+
+```
+Command (m for help): m   <== 输入 m 后，就会看到底下这些命令介绍
+Command action
+   a   toggle a bootable flag
+   b   edit bsd disklabel
+   c   toggle the dos compatibility flag
+   d   delete a partition            <==删除一个partition
+   l   list known partition types
+   m   print this menu
+   n   add a new partition           <==新增一个partition
+   o   create a new empty DOS partition table
+   p   print the partition table     <==在屏幕上显示分割表
+   q   quit without saving changes   <==不储存离开fdisk程序
+   s   create a new empty Sun disklabel
+   t   change a partition's system id
+   u   change display/entry units
+   v   verify the partition table
+   w   write table to disk and exit  <==将刚刚的动作写入分割表
+   x   extra functionality (experts only)
+```
+
+离开 fdisk 时按下 `q`，那么所有的动作都不会生效！相反的， 按下`w`就是动作生效的意思。
+
+```
+Command (m for help): p  <== 这里可以输出目前磁盘的状态
+
+Disk /dev/hdc: 41.1 GB, 41174138880 bytes        <==这个磁盘的文件名与容量
+255 heads, 63 sectors/track, 5005 cylinders      <==磁头、扇区与磁柱大小
+Units = cylinders of 16065 * 512 = 8225280 bytes <==每个磁柱的大小
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/hdc1   *           1          13      104391   83  Linux
+/dev/hdc2              14        1288    10241437+  83  Linux
+/dev/hdc3            1289        1925     5116702+  83  Linux
+/dev/hdc4            1926        5005    24740100    5  Extended
+/dev/hdc5            1926        2052     1020096   82  Linux swap / Solaris
+# 装置文件名 启动区否 开始磁柱    结束磁柱  1K大小容量 磁盘分区槽内的系统
+
+Command (m for help): q
+```
+
+###### 8.2文件系统
+
+### 9.shell
