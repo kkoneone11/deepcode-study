@@ -1,0 +1,827 @@
+# Mysql
+
+
+
+### 1.数据库设计
+
+###### 1.1数据库的基本操作
+
+MySQL安装完成后，要想将数据存储到数据库的表中，首先要创建一个数据库。创 建数据库就是在数据库系统中划分一块空间存储数据，语法如下：
+
+```mysql
+create database 数据库名称;
+```
+
+创建一个叫db1的数据库MySQL命令：
+
+```mysql
+-- 创建一个叫db1的数据库
+show create database db1;
+```
+
+运行效果展示：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2021030312520741.png)
+
+创建数据库后查看该数据库基本信息MySQL命令：
+
+```mysql
+show create database db1;
+```
+
+删除数据库MySQL命令：
+
+```mysql
+drop database db1;
+```
+
+查询出MySQL中所有的数据库MySQL命令：
+
+```mysql
+show databases;
+```
+
+运行效果展示：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210303125940965.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTg1MTk0NQ==,size_16,color_FFFFFF,t_70)
+
+将数据库的字符集修改为gbk MySQL命令：
+
+```mysql
+alter database db1 character set gbk; 
+```
+
+运行效果展示：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210303130330527.png)
+
+切换数据库 MySQL命令：
+
+```mysql
+use db1;
+```
+
+查看当前使用的数据库 MySQL命令：
+
+```sql
+select database();
+```
+
+
+
+### 2.DCL
+
+### 3.DQL
+
+> `Data QueryLanguage` 数据查询语言
+
+```mysql
+SELECT [ALL | DISTINCT]
+{* | table.* | [table.field1[as alias1][,table.field2[as alias2]][,...]]}
+FROM table_name [as table_alias]
+  [left | right | inner join table_name2]  -- 联合查询
+  [WHERE ...]  -- 指定结果需满足的条件
+  [GROUP BY ...]  -- 指定结果按照哪几个字段来分组
+  [HAVING]  -- 过滤分组的记录必须满足的次要条件
+  [ORDER BY ...]  -- 指定查询记录按一个或多个条件排序
+  [LIMIT {[offset,]row_count | row_countOFFSET offset}]; -- 指定查询的记录从哪条至哪条
+```
+
+- 查询数据库数据 , 如**SELECT**语句
+- 简单的单表查询或多表的复杂查询和嵌套查询
+- 是数据库语言中最核心,最重要的语句
+- 使用频率最高的语句
+
+###### 3.1基础查询
+
+> SELECT 查询列表 FROM 表名;
+
+- 查询列表可以是：表中的（一个或多个）字段，常量，变量，表达式，函数
+- 查询结果是一个虚拟的表格
+
+```mysql
+-- 查询全部学生
+SELECT * FROM student;
+
+-- 查询指定的字段
+SELECT `LoginPwd`,`StudentName` FROM student;
+
+-- 别名 AS(可以给字段起别名,也可以给表起别名)
+SELECT `StudentNo` AS 学号,`StudentName` AS 学生姓名 FROM student AS 学生表;
+
+-- 函数 CONCAT(str1,str2,...)
+SELECT CONCAT('姓名',`StudentName`) AS 新名字 FROM student;
+
+-- 查询系统版本(函数)
+SELECT VERSION();
+
+-- 用来计算(计算表达式)
+SELECT 100*53-90 AS 计算结果;
+
+-- 查询自增步长(变量)
+SELECT @@auto_increment_increment;
+
+-- 查询有哪写同学参加了考试,重复数据要去重
+SELECT DISTINCT `StudentNo` FROM result;
+```
+
+
+
+###### 3.2条件查询
+
+**语法**：
+
+```sql
+select 查询列表 from 表名 where 筛选条件;
+```
+
+```sql
+-- 查询考试成绩在95~100之间的
+SELECT `StudentNo`,`StudentResult` FROM result
+WHERE `StudentResult`>=95 AND `StudentResult`<=100;
+-- &&
+SELECT `StudentNo`,`StudentResult` FROM result
+WHERE `StudentResult`>=95 && `StudentResult`<=100;
+-- BETWEEN AND
+SELECT `StudentNo`,`StudentResult` FROM result
+WHERE `StudentResult`BETWEEN 95 AND 100;
+
+-- 查询除了1000号以外的学生
+SELECT `StudentNo`,`StudentResult` FROM result
+WHERE `StudentNo`!=1000;
+-- NOT
+SELECT `StudentNo`,`StudentResult` FROM result
+WHERE NOT `StudentNo`=1000;
+
+-- 查询名字含d的同学
+SELECT `StudentNo`,`StudentName` FROM student
+WHERE `StudentName` LIKE '%d%';
+
+-- 查询名字倒数第二个为d的同学
+SELECT `StudentNo`,`StudentName` FROM student
+WHERE `StudentName` LIKE '%d_';
+
+-- 查询1000,1001学员
+SELECT `StudentNo`,`StudentName` FROM student
+WHERE `StudentNo` IN (1000,1001)
+```
+
+
+
+###### 3.3分组查询
+
+**语法**：
+
+```sql
+select 分组函数，分组后的字段
+from 表
+【where 筛选条件】
+group by 分组的字段
+【having 分组后的筛选】
+【order by 排序列表】
+```
+
+**区别**：
+
+|            | 使用关键字 | 筛选的表     | 位置            |
+| ---------- | ---------- | ------------ | --------------- |
+| 分组前筛选 | where      | 原始表       | group by的前面  |
+| 分组后筛选 | having     | 分组后的结果 | group by 的后面 |
+
+```sql
+-- 查询不同科目的平均分、最高分、最低分且平均分大于90
+-- 核心：根据不同的课程进行分组
+SELECT SubjectName,AVG(StudentResult),MAX(`StudentResult`),MIN(`StudentResult`)
+FROM result r
+INNER JOIN `subject` s
+on r.SubjectNo=s.SubjectNo
+GROUP BY r.SubjectNo
+HAVING AVG(StudentResult)>90;
+```
+
+###### 3.4连接查询
+
+![image-20200718231304641](https://img-blog.csdnimg.cn/img_convert/6354aff6ecaee8ec2f2f7ec065304889.png)
+
+```sql
+-- 查询学员所属的年级（学号，学生姓名，年级名称）
+SELECT `StudentNo`,`StudentName`,`GradeName`
+FROM student s
+INNER JOIN grade g
+ON s.GradeID=g.GradeID;
+
+-- 查询科目所属的年级
+SELECT `SubjectName`,`GradeName`
+FROM `subject` s
+INNER JOIN `grade` g
+ON s.GradeID=g.GradeID;
+
+-- 查询列参加程序设计考试的同学信息（学号，姓名，科目名，分数）
+SELECT s.`StudentNo`,`StudentName`,`SubjectName`,`StudentResult`
+FROM student s
+INNER JOIN result r
+on s.StudentNo=r.StudentNo
+INNER JOIN `subject` sub
+on r.SubjectNo=sub.SubjectNo
+where SubjectName='课程设计';
+```
+
+**自连接：**
+
+自己的表和自己的表连接，核心：**一张表拆为两张一样的表即可**
+
+```sql
+-- 创建一个表
+CREATE TABLE `course` (
+`courseid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '课程id',
+`pid` INT(10) NOT NULL COMMENT '父课程id',
+`courseName` VARCHAR(50) NOT NULL COMMENT '课程名',
+PRIMARY KEY (`courseid`)
+) ENGINE=INNODB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8
+
+-- 插入数据
+INSERT INTO `course` (`courseid`, `pid`, `courseName`)
+VALUES('2','1','信息技术'),
+('3','1','软件开发'),
+('4','3','数据库'),
+('5','1','美术设计'),
+('6','3','web开发'),
+('7','5','ps技术'),
+('8','2','办公信息');
+```
+
+将该表进行拆分：
+
+| pid（父课程id） | courseid（课程id） | courseName（课程名） |
+| --------------- | ------------------ | -------------------- |
+| 1               | 2                  | 信息技术             |
+| 1               | 3                  | 软件开发             |
+| 1               | 5                  | 美术设计             |
+
+| pid（父课程id） | courseid（课程id） | courseName（课程名） |
+| --------------- | ------------------ | -------------------- |
+| 2               | 8                  | 办公信息             |
+| 3               | 4                  | 数据库               |
+| 3               | 6                  | web开发              |
+| 5               | 7                  | ps技术               |
+
+**操作**：查询父类对应的子类关系
+
+| 父类       | 子类                |
+| ---------- | ------------------- |
+| 信息技术 2 | 办公信息 4          |
+| 软件开发 3 | 数据库 4、web开发 6 |
+| 美术设计 5 | ps技术 7            |
+
+```sql
+SELECT a.`courseid` AS '父课程',b.`courseid` AS '子课程'
+FROM course AS a,course AS b
+WHERE a.`courseid`=b.`pid`;
+```
+
+
+
+###### 3.5排序和分页
+
+**排序：**
+
+**语法**：
+
+```sql
+select 查询列表
+from 表
+where 筛选条件
+order by 排序列表 asc/desc
+```
+
+- order by的位置一般放在查询语句的最后（除limit语句之外）
+
+| asc ：     | 升序，如果不写默认升序 |
+| ---------- | ---------------------- |
+| **desc：** | **降序**               |
+
+```sql
+SELECT `StudentNo`,`StudentName`,`GradeName`
+FROM student s
+INNER JOIN grade g
+ON s.GradeID=g.GradeID
+ORDER BY `StudentNo` DESC;
+```
+
+**分页：**
+
+**语法**：
+
+```sql
+select 查询列表
+from 表
+limit offset,pagesize;
+```
+
+- offset代表的是起始的条目索引，默认从0开始
+- size代表的是显示的条目数
+- offset=(n-1)*pagesize
+
+```sql
+-- 第一页 limit 0 5
+-- 第二页 limit 5,5
+-- 第三页 limit 10,5
+-- 第n页  limit (n-1)*pagesize,pagesize
+-- pagesize:当前页面大小
+-- (n-1)*pagesize:起始值
+-- n:当前页面
+-- 数据总数/页面大小=总页面数
+-- limit n 表示从0到n的页面
+```
+
+
+
+###### 3.6子查询
+
+**本质**：在 `where`子句中嵌套一个子查询语句
+
+```sql
+-- 查询‘课程设计’的所有考试结果（学号，科目编号，成绩）降序排列
+
+-- 方式一:使用连接查询
+SELECT `StudentNo`,r.`SubjectNo`,`StudentResult`
+FROM result r
+INNER JOIN `subject` s
+on r.StudentNo=s.SubjectNo
+WHERE SubjectName='课程设计'
+ORDER BY StudentResult DESC;
+-- 方式二:使用子查询（由里到外）
+SELECT StudentNo,SubjectNo,StudentResult
+from result
+WHERE SubjectNo=(
+	SELECT SubjectNo FROM `subject`
+	WHERE SubjectName='课程设计'
+)
+```
+
+
+
+
+
+### 4.DDL
+
+> 数据库定义语言，这些语句定义了不同的数据段、数据库、表、列、索引等数据库对象的定义。常用的语句关键主要包含create、delete、update和select等
+
+表常用语句
+1、创建篇
+
+例如常见一个名称为emp的表，表中字段包含3个字段，ename(姓名)，hiredate(解雇日期)、sal(薪水)，字段类型分别为varchar(10)、data、int(2)  关于字段类型后面会介绍。
+
+ create table emp(ename varchar(10),hiredate date,sal decimal(10,2),deptno int(2)); 
+
+查看emp表，将输出以下信息。
+
+desc emp;
+![img](https://img-blog.csdnimg.cn/20190222222049380.png)
+
+随时说desc命令可以查看表定义，但是输入信息还是不够全面。
+
+**show create table emp;**
+
+![img](https://img-blog.csdnimg.cn/20190222222258850.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMxOTg0ODc5,size_16,color_FFFFFF,t_70)
+
+
+
+**2、删除篇**
+
+表的删除语句
+
+**drop table tablename;**
+
+3、修改篇
+
+3.1、修改表类型语法如下：
+
+**alter table emp modify ename varchar(20);** 
+
+3.2、增加表字段
+
+**alter table emp add column age int(3);**
+
+3.3、删除表字段
+
+**alter table emp drop column age;**
+
+3.4、字段修改名
+
+alter table emp change ename username varchar(20);
+
+3.5、修改字段排列书序
+
+例如新增字段在birth 加到username之后；
+
+ **alter table emp add birth date after username;**
+
+3.6修改表编码设置utf-8
+
+alter table user convert to character set utf8;
+
+### 5.DML
+
+> `Data Manipulation Luaguge`：数据操作语言
+
+###### 5.1添加insert
+
+```mysql
+-- 普通用法
+INSERT INTO `student`(`name`) VALUES ('zsr');
+
+-- 插入多条数据
+INSERT INTO `student`(`name`,`pwd`,`sex`) VALUES ('zsr','200024','男'),('gcc','000421','女');
+
+-- 省略字段
+INSERT INTO `student` VALUES (5,'Bareth','123456','男','2000-02-04','武汉','1412@qq.com',1); 
+```
+
+语法：
+
+```mysql
+INSERT INTO 表名([字段1,字段2..])VALUES('值1','值2'..),[('值1','值2'..)..];
+```
+
+**注意**：
+
+1. 字段和字段之间使用英文逗号隔开
+2. 字段是可以省略的，但是值必须完整且一一对应
+3. 可以同时插入多条数据，VALUES后面的值需要使用逗号隔开
+
+###### 5.2.修改 update
+
+```mysql
+-- 修改学员名字,指定条件
+UPDATE `student` SET `name`='zsr204' WHERE id=1;
+
+-- 不指定条件的情况,会改动所有表
+UPDATE `student` SET `name`='zsr204';
+
+-- 修改多个属性
+UPDATE `student` SET `name`='zsr',`address`='湖北' WHERE id=1;
+
+-- 通过多个条件定位数据
+UPDATE `student` SET `name`='zsr204' WHERE `name`='zsr' AND `pwd`='200024';
+
+
+```
+
+**语法**：
+
+```mysql
+UPDATE 表名 SET 字段1=值1,[字段2=值2...] WHERE 条件[];
+```
+
+**关于WHERE条件语句**：
+
+| 操作符       | 含义     |
+| ------------ | -------- |
+| =            | 等于     |
+| <>或!=       | 不等于   |
+| >            | 大于     |
+| <            | 小于     |
+| <=           | 小于等于 |
+| >=           | 大于等于 |
+| BETWEEN…AND… | 闭合区间 |
+| AND          | 和       |
+| OR           | 或       |
+
+###### 5.3 删除 delete
+
+```sql
+-- 删除数据(避免这样写,会全部删除)
+DELETE FROM `student`;
+
+-- 删除指定数据
+DELETE FROM `student` WHERE id=1;
+```
+
+**语法**：
+
+```sql
+DELETE FROM 表名 [WHERE 条件]
+```
+
+关于`DELETE`删除的问题，重启数据库现象：
+
+- INNODB 自增列会从1开始（存在内存当中，断电即失）
+- MYISAM 继续从上一个子增量开始（存在内存当中，不会丢失）
+
+> TRUNCATE
+
+**作用**：完全清空一个数据库表，表的结构和索引约束不会变！
+
+DELETE和TRUNCATE 的区别：
+
+DELETE可以条件删除（where子句），而TRUNCATE只能删除整个表
+TRUNCATE 重新设置自增列，计数器会归零，而DELETE不会影响自增
+DELETE是数据操作语言（DML - Data Manipulation Language），操作时原数据会被放到 rollback segment中，可以被回滚；而TRUNCATE是数据定义语言（DDL - Data Definition Language)，操作时不会进行存储，不能进行回滚。
+
+
+
+### 6.事务
+
+> SQL执行：A转账给B
+> SQL执行：B收到A的钱
+
+将一组SQL放在一个批次中去执行
+
+- 例如银行转账：只有A转账成功且B成功到账，该事件才算结束，如果一方不成功，则该事务不成功
+
+###### 6.1事务原则ACID
+
+| 名称                      | 描述                                                         |
+| ------------------------- | ------------------------------------------------------------ |
+| **原子性（Atomicity）**   | 原子性是指事务是一个不可分割的工作单位，事务中的操作要么都发生，要么都不发生。 |
+| **一致性（Consistency）** | 事务前后数据的完整性必须保持一致。                           |
+| **隔离性（Isolation）**   | 事务的隔离性是多个用户并发访问数据库时，数据库为每一个用户开启的事务，不能被其他事务的操作数据所干扰，多个并发事务之间要相互隔离。 |
+| **持久性（Durability）**  | 事务一旦被提交则不可逆，被持久化到数据库中，接下来即使数据库发生故障也不应该对其有任何影响 |
+
+###### 6.2事务并发导致的问题
+
+| 名称           | 描述                                                         |
+| -------------- | ------------------------------------------------------------ |
+| **脏读**       | 指一个事务读取了另外一个事务未提交的数据。                   |
+| **不可重复读** | 在一个事务内读取表中的某一行数据，多次读取结果不同。         |
+| **虚读(幻读)** | 是指在一个事务内读取到了别的事务插入的数据，导致前后读取不一致。 |
+
+###### 6.3隔离级别
+
+> 在数据库操作中，为了有效保证并发读取数据的正确性，提出的**事务隔离级别**
+
+
+
+读未提交：一个事务读取到其他事务未提交的数据；这种隔离级别下，查询不会加锁，一致性最差，会产生脏读、不可重复读、幻读的问题
+
+读已提交：一个事务只能读取到其他事务已经提交的数据；该隔离级别避免了脏读问题的产生，但是不可重复读和幻读的问题仍然存在；
+
+读提交事务隔离级别是大多数流行数据库的默认事务隔离级别，比如 Oracle，但是不是 MySQL 的默认隔离界别
+
+可重复读：事务在执行过程中可以读取到其他事务已提交的新插入的数据，但是不能读取其他事务对数据的修改，也就是说多次读取同一记录的结果相同；该个里级别避免了脏读、不可重复度的问题，但是仍然无法避免幻读的问题
+
+可重复读是MySQL默认的隔离级别
+
+串行化：事务串行化执行，事务只能一个接着一个地执行,、，并且在执行过程中完全看不到其他事务对数据所做的更新；缺点是并发能力差，最严格的事务隔离，完全符合ACID原则，但是对性能影响比较大
+
+| **事务隔离级别**             | **脏读** | **不可重复读** | **幻读** |
+| ---------------------------- | -------- | -------------- | -------- |
+| 读未提交（read-uncommitted） | 是       | 是             | 是       |
+| 读已提交（read-committed）   | 否       | 是             | 是       |
+| 可重复读（repeatable-read）  | 否       | 否             | 是       |
+| 串行化（serializable）       | 否       | 否             | 否       |
+
+###### 6.4执行事务的过程
+
+**关闭自动提交**
+
+```sql
+SET autocommit=0; 
+```
+
+**事务开启**
+
+```sql
+START TRANSACTION -- 标记一个事务的开始，从这个之后的sql都在同一个事务内
+```
+
+**成功则提交，失败则回滚**
+
+```sql
+-- 提交：持久化（成功）
+COMMIT
+```
+
+**事务结束**
+
+```sql
+SET autocommit=1; -- 开启自动提交
+```
+
+**其他操作**
+
+```sql
+SAVEPOINT 保存点名; -- 设置一个事务的保存点
+ROLLBACK TO SAVEPOINT 保存点名; -- 回滚到保存点
+RELEASE SAVEPOINT 保存点名; -- 撤销保存点
+```
+
+
+
+
+
+
+
+### 7.索引
+
+> 索引（`Index`）是帮助MySQL高效获取数据的**数据结构**。
+
+###### 7.1索引分类
+
+### 主键索引（PRIMARY KEY）
+
+唯一的标识，主键不可重复，只有一个列作为主键
+
+- 最常见的索引类型，不允许为空值
+
+- 确保数据记录的唯一性
+
+- 确定特定数据记录在数据库中的位置
+
+  ```sql
+  -- 创建表的时候指定主键索引
+  CREATE TABLE tableName(
+    ......
+    PRIMARY INDEX (columeName)
+  )
+  
+  -- 修改表结构添加主键索引
+  ALTER TABLE tableName ADD PRIMARY INDEX (columnName)
+  ```
+
+  ### 普通索引（KEY / INDEX）
+
+  默认的，快速定位特定数据
+
+  - index 和 key 关键字都可以设置常规索引
+
+  - 应加在查询找条件的字段
+
+  - 不宜添加太多常规索引,影响数据的插入,删除和修改操作
+
+    ```sql
+    -- 直接创建普通索引
+    CREATE INDEX indexName ON tableName (columnName)
+    
+    -- 创建表的时候指定普通索引
+    CREATE TABLE tableName(
+      ......
+      INDEX [indexName] (columeName)
+    )
+    
+    -- 修改表结构添加普通索引
+    ALTER TABLE tableName ADD INDEX indexName(columnName
+    
+    ```
+
+    ### 唯一索引（UNIQUE KEY）
+
+    它与前面的普通索引类似，不同的就是：索引列的值必须唯一，但允许有空值
+
+    与主键索引的区别：主键索引只能有一个、唯一索引可以有多个
+
+```sql
+-- 直接创建唯一索引
+CREATE UNIQUE INDEX indexName ON tableName(columnName)
+
+-- 创建表的时候指定唯一索引
+CREATE TABLE tableName(  
+	......
+	UNIQUE INDEX [indexName] (columeName)  
+);  
+
+-- 修改表结构添加唯一索引
+ALTER TABLE tableName ADD UNIQUE INDEX [indexName] (columnName)
+```
+
+### 全文索引（FULLText）
+
+快速定位特定数据（百度搜索就是全文索引）
+
+- 在特定的数据库引擎下才有：MyISAM
+- 只能用于CHAR , VARCHAR , TEXT数据列类型
+- 适合大型数据集
+
+```sql
+-- 增加一个全文索引
+ALTER TABLE `student` ADD FULLTEXT INDEX `StudentName`(`StudentName`);
+
+-- EXPLAIN 分析sql执行的情况
+EXPLAIN SELECT * FROM student; -- 非全文索引
+EXPLAIN SELECT * FROM student WHERE MATCH(StudentName) AGAINST('d'); -- 全文索引
+```
+
+
+
+###### 7.2索引使用
+
+**7.2.1. 索引的创建**
+
+- 在创建表的时候给字段增加索引
+
+  ```sql
+  CREATE TABLE 表名 (
+      字段名1 数据类型 [完整性约束条件…],
+      字段名2 数据类型 [完整性约束条件…],
+      [UNIQUE|FULLTEXT|SPATIAL] INDEX|KEY [索引名] (字段名[(长度)] [ASC |DESC])
+  );
+  ```
+
+  - 创建完毕后，增加索引
+
+  ```sql
+  -- 方法一：CREATE在已存在的表上创建索引
+         CREATE [UNIQUE|FULLTEXT|SPATIAL] INDEX 索引名
+         ON 表名 (字段名[(长度)] [ASC |DESC]) ;
+  
+  -- 方法二：ALTER TABLE在已存在的表上创建索引
+         ALTER TABLE 表名 ADD [UNIQUE|FULLTEXT|SPATIAL] 
+         INDEX 索引名 (字段名[(长度)] [ASC |DESC]) ;
+  ```
+
+**7.2.2. 索引的删除**
+
+```sql
+-- 删除索引
+	DROP INDEX 索引名 ON 表名;
+-- 删除主键索引
+	ALTER TABLE 表名 DROP PRIMARY KEY;
+```
+
+**7.2.3显示索引信息**
+
+```sql
+SHOW INDEX FROM 表名;
+```
+
+**7.2.4explain分析sql执行的情况**
+
+```sql
+-- 增加一个全文索引
+ALTER TABLE `student` ADD FULLTEXT INDEX `StudentName`(`StudentName`);
+
+-- EXPLAIN 分析sql执行的情况
+EXPLAIN SELECT * FROM student; -- 非全文索引
+EXPLAIN SELECT * FROM student WHERE MATCH(StudentName) AGAINST('d'); -- 全文索引
+```
+
+
+
+###### 7.3索引测试
+
+**建表app_user：**
+
+```sql
+CREATE TABLE `app_user` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    `name` varchar(50) DEFAULT '' COMMENT '用户昵称',
+    `email` varchar(50) NOT NULL COMMENT '用户邮箱',
+    `phone` varchar(20) DEFAULT '' COMMENT '手机号',
+    `gender` tinyint(4) unsigned DEFAULT '0' COMMENT '性别（0:男；1：女）',
+    `password` varchar(100) NOT NULL COMMENT '密码',
+    `age` tinyint(4) DEFAULT '0' COMMENT '年龄',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+    `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATECURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='app用户表'
+```
+
+**批量插入数据：100w**
+
+```sql
+-- 1418错解决方案(创建函数前执行此语句)
+set global log_bin_trust_function_creators=true;
+
+-- 插入100万条数据
+DELIMITER $$	-- 写函数之前要写的标志
+CREATE FUNCTION mock_data()	-- 创建mock_data()函数
+RETURNS INT
+BEGIN
+	DECLARE num INT DEFAULT 1000000;
+	DECLARE i INT DEFAULT 0;
+	WHILE i < num DO
+  		INSERT INTO app_user(`name`, `email`, `phone`, `gender`, `password`, `age`)
+   		VALUES(CONCAT('用户', i), '24736743@qq.com', CONCAT('18', FLOOR(RAND()*(999999999-100000000)+100000000)),FLOOR(RAND()*2),UUID(), FLOOR(RAND()*100));
+  		SET i = i + 1;
+	END WHILE;
+	RETURN i;
+END;
+
+-- 执行函数
+SELECT mock_data();
+```
+
+**测试查询速度**
+
+```sql
+- 查询用户名为'用户9999'性能分析
+EXPLAIN SELECT * FROM app_user where name='用户99999'
+```
+
+**增加索引后测试**
+
+```sql
+-- 给name列创建常规索引
+CREATE INDEX id_app_user_name ON app_user(`name`)
+-- 再测试
+EXPLAIN SELECT * FROM app_user where name='用户99999'
+```
+
+
+
+###### 7.4索引原则
+
+- 索引不是越多越好，小数据量的表不需要加索引
+- 不要对经常变动的数据增加索引
+- 索引一般加在经常要查询的列上
